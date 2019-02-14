@@ -4,7 +4,7 @@
 select inserir_mes('Fevereiro');
 select  inserir_mes('Marco');
 select inserir_mes(22);
-select inserir_prato_generico('prato_principal','lasanha',true,20.00,2);
+select inserir_prato_generico('prato_principal','lasanha','s',10,2);
 select * from  mes;
 select inserir_funcionario('marlysson',2500);
 select inserir_funcionario('pereira',2000);
