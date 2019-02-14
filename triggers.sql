@@ -28,8 +28,8 @@ RETURNS TRIGGER AS $$
 DECLARE
 	horario_pedido TIME;
 begin      
-	horario_pedido := CURRENT_TIME(2);
---    SELECT data_pedido INTO data_pedido from pedido;
+	horario_pedido := CURRENT_TIME;
+	--    SELECT data_pedido INTO data_pedido from pedido;
 
     IF horario_pedido > "10:00" THEN
         RAISE EXCEPTION 'Perdão, um pedido só pode ser realizado até as 10:00 Am';
