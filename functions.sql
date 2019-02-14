@@ -163,7 +163,46 @@ $$ LANGUAGE PLPGSQL;
 
 
 
-
+create or replace function inserir_prato_generico(tabela TEXT,campo_um varchar,
+campo_dois Text,campo_tres Text,campo_quatro Text)
+	returns void as $inserir_prato_generico$
+	declare 
+	
+	begin
+		if tabela = 'prato_principal' then
+			if campo_um = '' or campo_dois = '' or campo_tres = '' or campo_quatro = '' or campo_cinco = '' then
+				raise exception	'Campos obrigatórios: nome,status,preco,quantidade';	
+			end if;
+			
+			if campo_quatro > 2 then
+				raise exception 'quantidade só pode ser até dois pedaços';
+			end if;
+			else
+			
+--				insert into prato_principal values (cast(campo_um as varchar),cast(campo_dois as bool),cast(campo_tres as float),cast(campo_quatro as int));
+				insert into prato_principal values (default,campo_um,campo_dois,campo_tres,campo_quatro);			
+		end if;	
+		if tabela = 'acompanhamento' then
+			if campo_um = '' or campo_dois = '' or campo_tres = '' or campo_quatro = '' or campo_cinco = '' then
+				raise exception	'Campos obrigatórios: nome,status,preco,quantidade';	
+			end if;
+			if campo_quatro > 1 then
+				raise exception 'quantidade do acompanhamento só pode ser até um tipo';
+			end if;
+			insert into prato_principal values (default, cast(campo_um as varchar),cast(campo_dois as bool),cast(campo_tres as float),cast(campo_quatro as int));
+		end if;		
+		if tabela = 'complemento' then
+			if campo_um = '' or campo_dois = '' or campo_tres = '' or campo_quatro = '' or campo_cinco = '' then
+				raise exception	'Campos obrigatórios: nome,status,preco,quantidade';	
+			end if;
+			if campo_quatro > 10 then 
+				raise exception 'quantidade de complemento exagerada!';
+				insert into prato_principal values (default, cast(campo_um as varchar),cast(campo_dois as bool),cast(campo_tres as float),cast(campo_quatro as int));
+			end if;
+		end if;	
+	end 
+	
+$inserir_prato_generico$ language plpgsql;
 
 
 
