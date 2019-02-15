@@ -251,7 +251,7 @@ create table item_complemento(
 );
 
 create table item_prato_principal(
- id int not null primary key,
+ id serial not null primary key,
  pedido_id int not null,
  prato_principal_id int not null,
 
