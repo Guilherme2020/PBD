@@ -1,41 +1,41 @@
 
-
-
-
--- Checar Usuário Tentando Manipular o Banco
-
-CREATE OR REPLACE FUNCTION ChecarSeVendedor()
-RETURNS TRIGGER AS $$
-DECLARE
-    usuario_atual TEXT;
-BEGIN
-    SELECT USER INTO usuario_atual;
-
-    IF usuario_atual <> 'funcionario' THEN
-        RAISE EXCEPTION 'Só um funcionario pode realizar essa operação.'
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-
-
-
-
--- Checar horario do pedido
-
-CREATE OR REPLACE FUNCTION ChecarHoraDoPedido()
-RETURNS TRIGGER AS $ChecarHoraDoPedido$
-DECLARE
-	horario_pedido TIME;
-begin      
-	horario_pedido :=  select CURRENT_TIME;
---	select into horario_pedido  data_pedido from pedido where id = new.id;
-    IF horario_pedido > "10:00" THEN
-        RAISE EXCEPTION 'Perdão, um pedido só pode ser realizado até as 10:00 Am';
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
----
+--
+--
+--
+---- Checar Usuário Tentando Manipular o Banco
+--
+--CREATE OR REPLACE FUNCTION ChecarSeVendedor()
+--RETURNS TRIGGER AS $$
+--DECLARE
+--    usuario_atual TEXT;
+--BEGIN
+--    SELECT USER INTO usuario_atual;
+--
+--    IF usuario_atual <> 'funcionario' THEN
+--        RAISE EXCEPTION 'Só um funcionario pode realizar essa operação.'
+--    END IF;
+--END;
+--$$ LANGUAGE plpgsql;
+--
+--
+--
+--
+--
+---- Checar horario do pedido
+--
+--CREATE OR REPLACE FUNCTION ChecarHoraDoPedido()
+--RETURNS TRIGGER AS $ChecarHoraDoPedido$
+--DECLARE
+--	horario_pedido TIME;
+--begin      
+--	horario_pedido :=  select CURRENT_TIME;
+----	select into horario_pedido  data_pedido from pedido where id = new.id;
+--    IF horario_pedido > "10:00" THEN
+--        RAISE EXCEPTION 'Perdão, um pedido só pode ser realizado até as 10:00 Am';
+--    END IF;
+--END;
+--$$ LANGUAGE plpgsql;
+-----
 CREATE OR REPLACE FUNCTION ChecarQuantidadeComplemento()
 RETURNS TRIGGER AS $ChecarQuantidadeComplemento$
 DECLARE
@@ -113,7 +113,19 @@ CREATE OR REPLACE FUNCTION ChecarQuantidadeAcompanhamento()
 RETURNS TRIGGER AS $ChecarQuantidadeAcompanhamento$
 DECLARE
 	quantidade_item int;
-begin      
+begin   
+	
+	if TG_OP = 'INSERT' then
+		select into quantidade_item quantidade from acompanhamento where id = new.acompanhamento_id;
+		raise notice '%', quantidade_item;
+		if not quantidade_item > 0 then 
+			raise exception 'nao tem acompanhamento disponivel';
+		else 
+			update acompanhamento set quantidade = quantidade_item - 1 where id = new.acompanhamento_id;
+--			update acompanhamento set quantidade = quantidade_item + 1 where id = old.acompanhamento_id and new.acompanhamento_id <> old.acompanhamento_id;
+		end if;
+		return new;
+	end if;
 	if TG_OP = 'UPDATE' then
 		select into quantidade_item quantidade from acompanhamento where id = new.acompanhamento_id;
 		raise notice '%', quantidade_item;

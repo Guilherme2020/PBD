@@ -117,32 +117,24 @@ returns void as $$
 	end 
 	
 $$ language plpgsql;
-
-
-
---CREATE FUNCTION CALCULAR_SALARIO_FUNCIONARIO(FUNCIONARIO_ID INT , MES_ID INT ) RETURNS FLOAT AS $$
-    -- PARA ESSE MÊS, CALCULAR  SALÁRIO DO FUNCIONÁRIO
-            -- AQUI FAZ A VERIFICAÇÃO DO QUANTO O FUNCIONARIO VENDEU ATRAVÉS DOS PEDIDOS
-        -- SELECIONAR OS PEDIDOS, VERIFICAR O PREÇO TOTAL * QUANTIDADE + SALARIO_FUNCIONARIO
-
-create or replace function aplicar_bonificacao_para_o_vendedor_do_mes (mes_id int ) 
-	returns float as $$
-    DECLARE 
-	
-        QTD_VENDAS_FUNC  int := 0;
-        SALARIO_ATUALIZADO float := 0;
-		porcentagem float := 0.15;
-		query float;
-
-    BEGIN
-
-		query :=  "select funcionario_id,valor_total from pedido  group by sum(valor_total)";
-		execute query;
-		SALARIO_ATUALIZADO := (SALARIO_ATUALIZADO +  query) *  porcentagem;
-        RETURN SALARIO_ATUALIZADO;
-    END;
-
-$$ LANGUAGE PLPGSQL;
+--create or replace function aplicar_bonificacao_para_o_vendedor_do_mes (mes_id int ) 
+--	returns float as $$
+--    DECLARE 
+--	
+--        QTD_VENDAS_FUNC  int := 0;
+--        SALARIO_ATUALIZADO float := 0;
+--		porcentagem float := 0.15;
+--		query float;
+--
+--    BEGIN
+--
+--		query :=  "select funcionario_id,valor_total from pedido  group by sum(valor_total)";
+--		execute query;
+--		SALARIO_ATUALIZADO := (SALARIO_ATUALIZADO +  query) *  porcentagem;
+--        RETURN SALARIO_ATUALIZADO;
+--    END;
+--
+--$$ LANGUAGE PLPGSQL;
 
 
 CREATE FUNCTION PAGAR_FUNCIONARIO(FUNCIONARIO_ID INT , MES_ID INT) RETURNS FLOAT AS $$
@@ -383,7 +375,7 @@ BEGIN
 	select into is_prato_do_dia prato_do_dia_id from pedido where id = pedido_atual_id;
 	select into valor_total_pedido preco from prato_do_dia where id = is_prato_do_dia;
 	if(is_prato_do_dia > 0 and not is_prato_do_dia isnull)then
-		update pedido set pago='s', valor_total = valor_total_pedido where id = pedido_atual_id;
+		update pedido set pago='s', valor_total = valor_total_pedido*0.75 where id = pedido_atual_id;
 	else
 		select into valor_total_pedido SUM(PP.preco * PP.quantidade) from prato_principal PP inner join 
 		item_prato_principal IP on PP.id = IP.prato_principal_id and IP.pedido_id = pedido_atual_id;
